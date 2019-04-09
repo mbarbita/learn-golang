@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- <script type="text/javascript" src="smoothie.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+  <!-- <script src="http://www.chartjs.org/samples/latest/utils.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.1.0"></script>
+
+</head>
+
+<body>
+  <!-- <canvas id="smoothie-chart" width="500" height="100"></canvas> -->
+  <div class="chart-container" style="position: relative; height:30vh; width:60vw">
+    <!-- <canvas id="myChart" width="300" height="100"></canvas> -->
+    <canvas id="myChart"></canvas>
+  </div>
+  <script type="text/javascript">
+    var socket = new WebSocket("ws://192.168.0.110:12345/rand");
+    var idx = 1;
+
+    //data
+    socket.onmessage = function(event) {
+      // idx++;
+      var d = new Date();
+      var hour = d.getHours();
+      var min = d.getMinutes();
+      var sec = d.getSeconds();
+      var dt = hour + ':';
+      if (min < 10) {
+        dt += '0';
+      }
+      dt += min + ':';
+      if (sec < 10) {
+        dt += '0';
+      }
+      dt += sec;
+
+      console.log(event.data, idx, dt);
+      // add data
+      chart.data.labels.push(dt);
+      //chart.data.datasets[0].data[idx]=event.data;
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(event.data);
+      });
+      //if (idx % 5 == 0) {
+      chart.update();
+      //}
+      // del data
+      if (idx > 11) {
+        chart.data.labels.shift();
+        chart.data.datasets.forEach((dataset) => {
+          dataset.data.shift();
+        });
+        //if (idx % 5 == 0) {
+        chart.update();
+        //}
+      }
+      idx++;
+    };
+    //chart
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      // The type of chart we want to create
+      type: 'line',
+      // The data for our dataset
+      data: {
+        //labels: ['test'],
+        datasets: [{
+            label: "data A",
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            lineTension: 0,
+            //cubicInterpolationMode: 'monotone',
+            data: [1, 2, 3, 4, 5, 6, 7],
+            fill: false,
+          },
+          {
+            label: "data B",
+            backgroundColor: 'blue',
+            borderColor: 'blue',
+            //lineTension: 0,
+            //cubicInterpolationMode: 'monotone',
+            data: [],
+            fill: false,
+          }
+        ]
+      },
+      // Configuration options go here
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          datalabels: {
+            backgroundColor: function(context) {
+              return context.dataset.backgroundColor;
+            },
+            borderRadius: 4,
+            color: 'white',
+            font: {
+              weight: 'bold'
+            },
+            formatter: Math.round
+          }
+        },
+        legend: {
+          position: 'left',
+          //  display: true,
+          labels: {
+            //fontColor: 'rgb(255, 99, 132)',
+            // padding: 50,
+          }
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

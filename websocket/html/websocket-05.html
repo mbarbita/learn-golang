@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- <script type="text/javascript" src="smoothie.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+</head>
+
+<body>
+  <!-- <canvas id="smoothie-chart" width="500" height="100"></canvas> -->
+  <div class="chart-container" style="position: relative; height:20vh; width:40vw">
+    <canvas id="myChart" width="300" height="100"></canvas>
+  </div>
+  <script type="text/javascript">
+    var socket = new WebSocket("ws://localhost:12345/rand");
+    var idx = 0;
+
+    //data
+    socket.onmessage = function(event) {
+      // idx++;
+      var d = new Date();
+      var hour = d.getHours();
+      var min = d.getMinutes();
+      var sec = d.getSeconds();
+      console.log(event.data, idx, hour + ':' + min + ':' + sec);
+      // add data
+      chart.data.labels.push(hour + ':' + min + ':' + sec);
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(event.data);
+      });
+      chart.update();
+
+      // del data
+      if (idx > 10) {
+        chart.data.labels.shift();
+        chart.data.datasets.forEach((dataset) => {
+          dataset.data.shift();
+        });
+        chart.update();
+      }
+      idx++;
+      // series.append(new Date().getTime(), event.data);
+    };
+    //chart
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      // The type of chart we want to create
+      type: 'line',
+
+      // The data for our dataset
+      data: {
+        labels: [],
+        datasets: [{
+          label: "data A",
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          data: [],
+          fill: false,
+        }]
+      },
+
+      // Configuration options go here
+      options: {}
+    });
+    // var chart = new SmoothieChart({maxValue: 60, minValue: -60}),
+    // canvas = document.getElementById('smoothie-chart'),
+    // series = new TimeSeries();
+
+    // chart.addTimeSeries(series, {lineWidth: 2, strokeStyle: '#00ff00'});
+    // chart.streamTo(canvas, 500);
+  </script>
+</body>
+
+</html>

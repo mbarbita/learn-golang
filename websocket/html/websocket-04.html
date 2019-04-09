@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+</head>
+
+<body>
+  <canvas id="myChart" width="400" height="400"></canvas>
+
+  <script type="text/javascript">
+    var socket = new WebSocket("ws://localhost:12345/rand");
+    var cl = 1;
+
+    //data
+    socket.onmessage = function(event) {
+      console.log(event.data, cl);
+      var date = new Date();
+      var min = date.getMinutes();
+      var sec = date.getSeconds();
+      chart.data.labels.push(min + '.' + sec);
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(event.data);
+      });
+      chart.update();
+
+      cl++;
+
+if (cl >5) {
+      chart.data.labels.pop();
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+      });
+      chart.update();
+    }
+
+    };
+    //chart
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      // The type of chart we want to create
+      type: 'line',
+
+      // The data for our dataset
+      data: {
+        labels: ["January"],
+        datasets: [{
+          label: "My First dataset",
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          data: [0],
+          fill: false,
+        }]
+      },
+
+      // Configuration options go here
+      options: {}
+    });
+  </script>
+</body>
+
+</html>

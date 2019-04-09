@@ -1,0 +1,34 @@
+a {
+  background-color:  silver;
+  text-decoration: none;
+  border: solid;
+  border-width: thin;
+  border-color: silver;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.ct-a {
+  border: solid;
+  border-width: thin;
+  border-color: silver;
+  margin: 0.5em;
+  padding: 0.5em;
+  box-shadow: 2px 2px 5px silver;
+
+}
+
+.ct-b {
+  background-color: #c0c0c0;
+}
+
+.light {
+  background-color: white;
+  color: black;
+}
+
+.dark {
+  background-color: #202020;
+  color: white;
+
+}
